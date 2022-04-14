@@ -4,10 +4,6 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CopyGroupPlugin
 {
@@ -31,10 +27,13 @@ namespace CopyGroupPlugin
                 XYZ offset = groupCenter - roomCenter;
 
                 XYZ point = uiDoc.Selection.PickPoint("Выберите точку вставки");
+                Room room2 = GetRoomByPoint(doc, point);
+                XYZ roomCenter2 = GetElementCenter(room2);
+                XYZ offset2 = roomCenter2 + offset;
 
                 Transaction transaction = new Transaction(doc);
                 transaction.Start("Копирование группы объектов");
-                doc.Create.PlaceGroup(point, group.GroupType);
+                doc.Create.PlaceGroup(offset2, group.GroupType);
                 transaction.Commit();
             }
             catch (Autodesk.Revit.Exceptions.OperationCanceledException)
@@ -81,6 +80,10 @@ namespace CopyGroupPlugin
                 return true;
             else
                 return false;
+        }
+        public bool AllowReference (Reference reference, XYZ position)
+        {
+            return false;
         }
     } 
 }
